@@ -1695,6 +1695,26 @@ pub fn rotate_csrf_token_in_response(
     }
 }
 
+pub fn extract_and_validate_csrf_token(req: &HttpRequest, csrf_token: &[u8]) -> Result<(), Error> {
+    let extensions = req.extensions();
+    let token = match extensions.get::<CsrfToken>().cloned() {
+        Some(token) => token,
+        None => {
+            return Err(actix_web::error::ErrorInternalServerError(
+                "Missing CSRF token field",
+            ))
+        }
+    };
+
+    if !eq_tokens(token.0.as_bytes(), csrf_token) {
+        return Err(actix_web::error::ErrorInternalServerError(
+            "Invalid CSRF token",
+        ));
+    }
+
+    Ok(())
+}
+
 fn check_secret_key(secret_key: &[u8]) {
     if secret_key.len() < 32 {
         panic!("csrf secret_key too short: require >=32 bytes");
