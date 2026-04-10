@@ -1,8 +1,29 @@
-use actix_csrf_middleware::{CsrfMiddleware, CsrfMiddlewareConfig};
+use actix_csrf_middleware::{
+    CsrfMiddleware, CsrfMiddlewareConfig, CsrfToken, DEFAULT_CSRF_TOKEN_FIELD,
+};
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 
-async fn render_form() -> impl Responder {
-    HttpResponse::Ok().body("TODO")
+async fn render_form(csrf: CsrfToken) -> impl Responder {
+    let html = format!(
+        r#"<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Multipart CSRF example</title></head>
+<body>
+  <h1>Multipart Upload with CSRF</h1>
+  <form method="post" action="/upload" enctype="multipart/form-data">
+    <input type="hidden" name="{field}" value="{val}" />
+    <div><label>File: <input type="file" name="file" /></label></div>
+    <button type="submit">Upload</button>
+  </form>
+</body>
+</html>"#,
+        field = DEFAULT_CSRF_TOKEN_FIELD,
+        val = csrf.0
+    );
+
+    HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(html)
 }
 
 async fn upload_handler() -> impl Responder {
