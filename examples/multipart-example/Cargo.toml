@@ -1,0 +1,10 @@
+[package]
+name = "actix-csrf-middleware-example-multipart"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+actix-web = "4"
+actix-csrf-middleware = { path = "../../" }
+actix-multipart = "0.7"
+futures-util = "0.3"

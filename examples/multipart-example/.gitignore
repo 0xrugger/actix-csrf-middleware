@@ -1,0 +1,3 @@
+# Local planning/task files — not part of the contribution
+*.md
+!README.md
